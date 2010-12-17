@@ -1,0 +1,157 @@
+import os,sys,re
+
+# Basic variables
+HOME = str(Dir("#"))
+BUILD = os.path.join(HOME,"build")
+
+if os.name == "posix":
+	EXTERNAL_INCLUDE = ["/usr/include","/usr/local/include"]
+	EXTERNAL_LIB = ["/lib","/usr/lib","/usr/local/lib"]
+else:
+	EXTERNAL_INCLUDE = []
+	EXTERNAL_LIB = []
+PREFIX = ARGUMENTS.get("PREFIX","/usr/local")
+
+# User-Defined External Include Directories
+OGRE_INCLUDE = ARGUMENTS.get("ogre-include","/usr/local/include/OGRE")
+CEGUI_INCLUDE = ARGUMENTS.get("cegui-include","/usr/local/include/CEGUI")
+OIS_INCLUDE = ARGUMENTS.get("ois-include","/usr/local/include")
+
+# User-Defined External Lib Directories
+OGRE_LIB = ARGUMENTS.get("ogre-lib","/usr/local/lib")
+CEGUI_LIB = ARGUMENTS.get("cegui-lib","/usr/local/lib")
+OIS_LIB = ARGUMENTS.get("ois-lib","/usr/local/lib")
+
+# Make sure we can import our build tools
+if not BUILD in sys.path:
+	sys.path.append(BUILD)
+
+# Import the build tools
+import sconsx
+
+# Define build functions
+def get_header_locations():
+	"""
+	Does its best to find all the required header files and returns
+	the directories that serve as the include directories for the
+	libraries
+	"""
+	
+	ret = set()
+	
+	for include in EXTERNAL_INCLUDE:
+		ret.add(include)
+	
+	#
+	## Find Ogre.h
+	#
+	
+	# First, look in all the default locations
+	for include in EXTERNAL_INCLUDE:
+		ret.add(os.path.join(include,"OGRE"))
+	
+	# Then add in the user one
+	ret.add(OGRE_INCLUDE)
+	
+	#
+	## Find CEGUI
+	#
+	# First, look in all the default locations
+	for include in EXTERNAL_INCLUDE:
+		cegui = os.path.join(include,"CEGUI")
+		print cegui
+		ret.add(os.path.join(include,"CEGUI"))
+	
+	# User locations:
+	ret.add(CEGUI_INCLUDE)
+	
+	#
+	## Find OIS
+	#
+	
+	# No need to look in default location since we use OIS/OIS.h style
+	ret.add(OIS_INCLUDE)
+	
+	print ret
+	ret = list(ret)
+	print ret
+	
+	return ret
+	
+def get_env():
+	return Environment()
+	
+def configure(env):
+	# Autoconf Functionality
+	conf = Configure(env)
+	
+	# Make the configurer
+	configurer = sconsx.Configurer(conf)
+	
+	# Get the locations of the headers
+	header_locations = get_header_locations()
+	for location in header_locations:
+		configurer.add_header_location(location)
+	
+	# Get the locations of the libs
+	
+	# Tell the framework what
+
+	print "Found Ogre.h at %s" % configurer.find_header("Ogre.h",["/usr/local/include/OGRE"])
+	
+	# Add a check for required headers
+	configurer.add_header("Ogre.h")
+	configurer.add_header("CEGUI.h")
+	configurer.add_header(os.path.join("OIS","OIS.h"))
+	
+	# Check for required libraries
+	configurer.add_lib("OgreMain")
+	
+	# Do the actual configure step
+	conf = configurer.configure()
+	
+	return conf
+
+def compile(env):
+	""
+	cpp = compile_cpp(env)
+	python = compile_python(env)
+	
+	return cpp + python
+
+def compile_cpp(env):
+	# This will be a list of nodes
+	ret = []
+	
+	# Add local stuff
+	env["LIBPATH"].append("#lib")
+	env["CPPPATH"].append("#include")
+	
+	# Make a shared library
+	so = env.SharedLibrary("lib/ogre-examples",Glob("src/cpp/**/*.cpp"))
+	
+	# Make executable
+	exe_env = env.Clone()
+	exe_env["LIBS"].append("ogre-examples")
+	
+	BasicSample = exe_env.Program("bin/BasicSample",Glob("src/cpp/BasicSample.cpp"))
+	UsingCameras = exe_env.Program("bin/UsingCameras","src/cpp/UsingCameras.cpp")
+	# Make aliases
+	#Alias(so,"shared")
+	#Alias(exe,"main")
+	
+	ret.append([so,BasicSample,UsingCameras])
+	return ret
+
+def compile_python(env):
+	return []
+	
+def install():
+	""
+	
+
+# Declare everything
+env = get_env()
+configure(env)
+compile(env)
+install()

@@ -1,0 +1,4 @@
+<root>
+	<aChild attr="Hello World"></aChild>
+	<bChild attr2="Hi!"></bChild>
+	<aChild attr="Hello again!"></aChild></root>

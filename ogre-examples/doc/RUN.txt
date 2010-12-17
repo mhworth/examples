@@ -1,0 +1,6 @@
+To run this, you will need to edit the 
+config/resources.cfg to point to the OGRE sample models... I'm too lazy
+to come up with my own :)
+
+It is easiest if you just make a symlink to ogre/Media and put it in the
+current working directory.

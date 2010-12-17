@@ -1,0 +1,12 @@
+#################################################################
+# Main cpp-examples scons construction file 					#
+#################################################################
+# Author: Matt Hollingsworth									#
+# Date: 10-19-07												#
+# Packages:														#
+#			examples/ace										#
+#			examples/boost										#
+#			examples/corba (omniorb)							#
+#			examples/scons										#
+#			examples/xdaq										#
+#################################################################

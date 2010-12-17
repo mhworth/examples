@@ -1,0 +1,35 @@
+<ivysettings>
+  <!--BEGIN BOILERPLATE XML-->
+  
+  <!--Get all bootstrap-esque properties,
+  such as ${build-common}
+  -->
+  <properties file="build.properties"/>
+  <property name="apache.maven2.repository.url" value="http://repo1.maven.org"/>
+  
+  <!-- Include the core ivysettings-->
+  <!--<include file="${build.common}/ivy/ivysettings-common.xml"/>-->
+	
+  <!--END BOILERPLATE XML-->	
+  
+  <resolvers>
+  
+    <chain name="all">
+    	<url name="ibiblio" m2compatible="true">
+  			<artifact pattern="http://www.ibiblio.org/maven2/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]"/>
+  			<artifact pattern="http://www.ibiblio.org/maven2/[organisation]/[module]/[artifact]/[revision]/[artifact]-[revision].[ext]"/>
+		</url>
+		
+		<url name="apache.repository.maven2" m2compatible="true">
+	    	<artifact pattern="${apache.maven2.repository.url}/maven2/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]"/>
+	    	<artifact pattern="${apache.maven2.repository.url}/maven2/org/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]"/>
+		</url>
+    </chain>
+  	
+  </resolvers>
+  
+  <modules>
+  	<module organisation="*" name="*" resolver="all"/>
+  </modules>
+  
+</ivysettings>

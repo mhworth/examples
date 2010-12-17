@@ -1,0 +1,131 @@
+#########################################################
+# ACE Examples SConstruct file							#
+#														#
+# Dependencies: ACE										#
+# Dependent Environment variables:						#
+#			ACE_INCLUDE: The ACE include directory		#
+#			ACE_LIB: The ACE library directory			#
+# Output directory: <examples root>/bin/ace				#
+# Targets:												#
+#			all											#
+#			doc											#
+#			logging										#
+#			sockets										#
+#			unicast-servers								#
+#			unicast-clients								#
+#			multicast-servers							#
+#			multicast-clients							#
+#			ace-xml										#
+#			ace-directories								#
+#			ace-io										#
+#			ace-threading								#
+#			ace-time									#
+#			ace-os-net-utils							#
+#			ace-event									#
+#			ace-util									#
+#			ace-compiler-utils							#
+#			ace-checksum								#
+#														#
+#########################################################
+print "Building the ACE Examples Package"
+
+#Necessary imports
+import os
+
+#Get relevant variables
+ACE_INCLUDE = ""
+ACE_LIB = ""
+try:
+	ACE_INCLUDE = os.environ['ACE_INCLUDE']
+	ACE_LIB = os.environ['ACE_LIB']
+except KeyError:
+	if(os.name=="nt"):
+		print "Please set the ACE_INCLUDE and ACE_LIB environment variables.  See the documentation for more imformation"
+		exit(0)
+BUILD_ROOT = "../../../.."
+DEFAULT_EXECUTABLE_EXTENSION = ""
+if os.name=="nt":
+	DEFAULT_EXECUTABLE_EXTENSIO = ".exe"
+
+
+#Set up the include directories
+include_dirs = [BUILD_ROOT + "/include", ACE_INCLUDE]
+
+#Set up the sources for each target
+#The first entry always contains the main method
+
+#####################################
+###	Begin source list definitions ###
+#####################################
+
+#Sources for logging target
+logging_sources = \
+		Split("""	logging/LoggingMain.cpp		""")
+
+#Sources for sockets target
+sockets_sources = \
+		Split("""	sockets/SocketsMain.cpp 
+					sockets/OpenSocket.cpp		""")
+					
+#Sources for unicast-servers target
+unicast_servers_sources = \
+		Split("""	unicast-servers/UnicastServersMain.cpp	""")
+
+#Sources for unicast-clients target
+unicast_clients_sources = \
+		Split("""	unicast-clients/UnicastClientsMain.cpp	""")
+		
+#Sources for multicast-servers target
+multicast_servers_sources = \
+		Split("""multicast-servers/MulticastServersMain.cpp""")
+		
+#Sources for multicast-client target
+multicast_clients_sources = \
+		Split("""multicast-clients/MulticastClientsMain.cpp""")
+		
+#Sources for ace-xml target
+ace_xml_sources = \
+		Split("""ace-xml/AceXmlMain.cpp""")
+		
+#Sources for ace-directories target
+ace_directories_sources = \
+		Split("""ace-directories/AceDirectoriesMain.cpp""")
+		
+#Sources for ace-io target
+ace_io_sources = \
+		Split("""ace-io/AceIoMain.cpp""")
+		
+#Sources for ace-threading target
+ace_treading_sources = \
+		Split("""ace-threading/AceThreadingMain.cpp""")
+		
+#Sources for ace-time target
+ace_time_sources = \
+		Split("""ace-time/AceTimeMain.cpp""")
+		
+#Sources for ace-os-net-utils target
+ace_os_net_utils_sources = \
+		Split("""ace-os-net-utils/AceOsNetUtilsMain.cpp""")
+		
+#Sources for the ace-event target
+ace_event_sources = \
+		Split("""ace-event/AceEventMain.cpp""")
+		
+#Sources for the ace-util target
+ace_util_sources = \
+		Split("""ace-util/AceUtilMain.cpp""")
+
+#Sources for the ace-compiler-utils target
+ace_compiler_utils_sources = \
+		Split("""ace-compiler-utils/AceCompilerUtilsMain.cpp""")
+
+###################################
+###	End source list definitions ###
+###################################
+
+#Output directory
+OUTPUT_DIR = "bin/"
+
+#TODO: Set up the targets
+Program(OUTPUT_DIR + "logging" + DEFAULT_EXECUTABLE_EXTENSION, "logging/LoggingMain.cpp", CPPPATH=include_dirs)
+Program(OUTPUT_DIR + "sockets" + DEFAULT_EXECUTABLE_EXTENSION, sockets_sources, CPPPATH=include_dirs)

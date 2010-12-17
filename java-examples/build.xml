@@ -1,0 +1,137 @@
+<project 
+	xmlns:ivy="antlib:org.apache.ivy.ant"
+	name="mhworth-examples" default="dist" basedir=".">
+	<description>
+        mhworth.com: Examples
+    </description>
+
+	<!--Set build variables-->
+	<property file="build.properties"/>
+
+	<!--Other Properties-->
+	<property file="project.properties"/>
+
+	<!--Remap version property-->
+	<property name="version" value="${project.version}"/>
+	<property name="ivy.revision" value="${project.version}"/>
+
+	<!--Figure out the classpath-->
+	<path id="classpath-standard">
+		<fileset dir="${lib.dir}" includes="*.jar"/>
+		<pathelement path="${classpath}"/>
+	</path>
+
+	<!--Source in common targets-->
+	<target name="resolve" description="--> retrieve dependencies with ivy">
+		<ivy:retrieve pattern="${lib.dir}/[artifact].[ext]"/>
+	</target>
+
+	<!--!!!!!!!!!!!!!!!!!!!!!!!!!-->
+	<!--END BOILERPLATE BUILD.XML-->
+	<!--!!!!!!!!!!!!!!!!!!!!!!!!!-->
+
+	<!--NOTE: all *-standard tasks are defined in ${build.common}/ant/*-tasks.xml-->
+
+	<!-- Use predefined tasks-->
+
+	<!--Initialize the build.  See ${build.common}/ant/initialize-tasks.xml-->
+	<target name="init" description="Initializes build">
+		<!-- Create the time stamp -->
+		<tstamp/>
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${build.dir}"/>
+		<!--Make sure the library directory exists-->
+		<mkdir dir="${lib.dir}"/>
+		<!--Make sure the distribution directory exists-->
+		<mkdir dir="${dist.dir}"/>
+	</target>
+
+	<target name="all" description="Initializes build">
+		<antcall target="resolve"/>
+		<antcall target="compile"/>
+	</target>
+
+	<!-- Compile all sources.  See ${build.common}/ant/compile-tasks.xml-->
+	<target name="compile" depends="init"
+	        description="compile the source " >
+		<javac srcdir="${src.java}" destdir="${build.dir}" classpathref="classpath-standard" debug="true"/>
+
+		<copy todir="${build.dir}">
+			<fileset dir="${src.java}" includes="**/*"/>
+		</copy>
+
+	</target>
+
+	<!--Make the jar file.  See ${build.common}/ant/dist-tasks.xml-->
+	<target name="jar" description="Makes a jar" depends="compile">
+		<path id="base" location="${lib.dir}"/>
+		<property name="base" refid="base"/>
+		<echo message="base=${base}"/>
+		<pathconvert property="jar.classpath" refid="classpath-standard"
+				  	                 pathsep=" " dirsep="/">
+			<map from="${base}" to="lib" />
+		</pathconvert>
+
+		<!-- Copy the source to the build directory-->
+		<copy todir="${build.dir}">
+			<fileset dir=".">
+				<patternset id="dist-includes">
+					<exclude name="**/*.tar.gz"/>
+					<exclude name="**/*.zip"/>
+					<exclude name="**/*.log"/>
+					<include name="${src.dir}"/>
+				</patternset>
+			</fileset>
+		</copy>
+
+		<echo message="jar.classpath=${jar.classpath}"/>
+		<jar destfile="${dist.dir}/${ant.project.name}-${project.version}.jar" basedir="${build.dir}">
+			<manifest>
+				<attribute name="Main-Class" value="${main.class}"/>
+				<attribute name="Class-Path" value="${jar.classpath}"/>
+			</manifest>
+		</jar>
+
+	</target>
+
+	<!--Create a distribution.  See ${build-common}/ant/dist-tasks.xml-->
+	<target name="dist" description="Makes a distribution" depends="jar">
+		<!-- Create the distribution directory -->
+		<copy todir="${dist.dir}">
+			<fileset dir=".">
+				<patternset id="dist-includes">
+					<exclude name="**/*.tar.gz"/>
+					<exclude name="**/*.zip"/>
+					<exclude name="**/*.log"/>
+					<exclude name="**/*.dat"/>
+					<exclude name="dist/**"/>
+					<exclude name="bin/**"/>
+					<exclude name="bin"/>
+					<exclude name="dist"/>
+					<exclude name="${build.dir}"/>
+					<exclude name="${dist.dir}"/>
+					<include name="**/**"/>
+				</patternset>
+			</fileset>
+		</copy>
+
+		<zip destfile="./${ant.project.name}-${version}.zip">
+			<zipfileset dir="${dist.dir}" prefix="${ant.project.name}-${project.version}"/>
+		</zip>
+
+		<tar compression="gzip" destfile="./${ant.project.name}-${project.version}.tar.gz">
+			<tarfileset dir="${dist.dir}" prefix="${ant.project.name}-${project.version}"/>
+		</tar>
+	</target>
+
+
+
+	<!--Clean out all newly created artifacts.  See ${build.common}/ant/clean-tasks.xml-->
+	<target name="clean" description="Cleans all">
+		<delete includeEmptyDirs="true" dir="${build.dir}"/>
+		<delete includeEmptyDirs="true" dir="${dist.dir}"/>
+		<delete file="./${ant.project.name}-${version}.zip"/>
+		<delete file="./${ant.project.name}-${version}.tar.gz"/>
+	</target>
+
+</project>

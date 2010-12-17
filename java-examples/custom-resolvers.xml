@@ -1,0 +1,7 @@
+<ivysettings>
+
+	<!--Placeholder for a custom resolver-->
+	<resolvers>
+		<chain name="custom"/>
+	</resolvers>
+</ivysettings>

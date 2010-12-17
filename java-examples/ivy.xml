@@ -1,0 +1,31 @@
+<ivy-module version="1.1">
+	
+  <info organisation="${ivy.organisation}" module="${ivy.module}" revision="${project.version}"/>
+
+  <configurations>
+  
+    <!-- core dependencies needed at compile-time, test-time, and runtime -->
+    <conf name="global" visibility="private" />
+    
+    <!-- default configuration that 'by default' pulls in the global configuration -->
+    <conf name="default" extends="global" />
+    
+    <!-- additional dependencies such as the source tar.gz/zips -->
+    <conf name="full" extends="default"/>
+    
+    <!-- additional dependencies needed only for tests -->
+	<conf name="test" extends="global" />
+
+  </configurations>
+      
+  <publications>
+  	<artifact name="mhworth-examples" type="jar"/>
+  </publications>
+  
+  <dependencies>
+	<dependency org="org/apache" name="wicket" rev="1.4-rc2">
+		<artifact name="wicket" type="jar"/>
+	</dependency>
+  </dependencies>
+  
+</ivy-module>
